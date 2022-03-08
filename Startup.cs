@@ -36,7 +36,7 @@ namespace RunningMan
 
             services.AddControllers();
             services.AddScoped<IAccountRepository, AccountRepository>();
-
+            services.AddScoped<IUserRepository, UserRepository>();
             services.Configure<AppSetting>(Configuration.GetSection("AppSettings"));
 
             services.AddDbContext<MyDbContext>(option => {
