@@ -1,0 +1,120 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
+using Newtonsoft.Json.Linq;
+using PrCore.DataContext;
+using PrOpenApi.BO;
+using PrOpenApi.Models;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace PrOpenApi.Controller
+{
+    [Route("api/[controller]")]
+    public class UserController:PrOpenApiController
+    {
+        protected PrDataContext _ctxData;
+        protected UserNameBO usernameBO;
+
+        public UserController(PrDataContext ctxData)
+        {
+            _ctxData = ctxData;
+            usernameBO = BizUtilities.GetBiz<UserNameBO>() ?? new UserNameBO(ctxData.PrDB);
+
+        }
+        [AllowAnonymous]
+        [AcceptVerbs("POST")]
+        [Route("User")]
+        public Object SignUp([FromBody] JObject frmData)
+        {
+            Username username = frmData.ToObject<Username>();
+            try
+            {
+                Username result = (Username)usernameBO.CreateUser(username);
+                usernameBO.Insert(result);
+
+            }
+            catch
+            {
+
+            }
+            return username;
+        }
+
+        [AllowAnonymous]
+        [AcceptVerbs("GET")]
+        [Route("User")]
+        public Object UserData(string username)
+        {
+            
+            try
+            {
+                var data = new Username();
+                
+                if (!string.IsNullOrEmpty(username))
+                {
+                    data = usernameBO.LoadUser(username);
+                }
+
+                return data;
+            }
+            catch
+            {
+                return "Load User fail";
+            }
+            
+        }
+
+        [AllowAnonymous]
+        [AcceptVerbs("PUT")]
+        [Route("User")]
+        public object UpdateUser(JObject frmData)
+        {
+            Username username = frmData.ToObject<Username>();
+            try
+            {
+                return usernameBO.UpdateUser(username);
+                
+            }
+            catch
+            {
+                return "Load User fail";
+            }
+        }
+        [AllowAnonymous]
+        [AcceptVerbs("DELETE")]
+        [Route("User")]
+        public void DeleteUser(string sysCode)
+        {
+            try
+            {
+                usernameBO.DeleteUser(sysCode);
+            }
+            catch
+            {
+
+            }
+        }
+        [AllowAnonymous]
+        [AcceptVerbs("GET")]
+        [Route("FindAllUser")]
+        public object FindAllUser(string username)
+        {
+            try
+            {
+                return usernameBO.AllUser(username);
+
+            }
+            catch
+            {
+                return "Fall";
+            }
+        }
+
+
+
+    }
+
+    
+}
